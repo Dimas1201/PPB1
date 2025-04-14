@@ -1,6 +1,16 @@
-class Todo {
+import 'package:hive/hive.dart';
+
+part 'todo.g.dart'; // untuk generate adapter
+
+@HiveType(typeId: 0)
+class Todo extends HiveObject {
+  @HiveField(0)
   String title;
+
+  @HiveField(1)
   bool isCompleted;
+
+  @HiveField(2)
   bool isEditing;
 
   Todo({
@@ -9,7 +19,7 @@ class Todo {
     this.isEditing = false,
   });
 
-  // Setters and getters for isEditing and title
+  // Setter dan getter untuk isEditing dan title
   setEditing(bool value) {
     isEditing = value;
   }
@@ -18,12 +28,12 @@ class Todo {
     title = value;
   }
 
-  // Toggle the completion status of the todo
+  // Toggle status completion
   toggleCompletion() {
     isCompleted = !isCompleted;
   }
 
-  // Convert the todo to a JSON object
+  // Convert todo menjadi format JSON
   Map<String, dynamic> toJson() {
     return {
       'title': title,
@@ -31,13 +41,11 @@ class Todo {
     };
   }
 
-  // Factory method to create a Todo from a JSON object
+  // Membuat Todo dari JSON
   factory Todo.fromJson(Map<String, dynamic> json) {
     return Todo(
       title: json['title'],
       isCompleted: json['isCompleted'],
     );
   }
-
-// Add other methods as needed
 }

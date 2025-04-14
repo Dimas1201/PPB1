@@ -1,0 +1,2 @@
+C:/Users/DIMAS/ppb/todo-main/android/app/.cxx/RelWithDebInfo/322o443p/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/DIMAS/ppb/todo-main/android/app/.cxx/RelWithDebInfo/322o443p/armeabi-v7a/CMakeFiles/rebuild_cache.dir

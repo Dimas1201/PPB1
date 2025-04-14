@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive/hive.dart';
 
 class SettingsScreen extends StatefulWidget {
   final String theme;
@@ -20,6 +20,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _selectedTheme = widget.theme;
   }
 
+  // Fungsi untuk menyimpan tema yang dipilih ke Hive
+  Future<void> saveTheme(String theme) async {
+    var box = await Hive.openBox('settings'); // Buka box 'settings'
+    await box.put('theme', theme); // Menyimpan tema
+  }
+
+  // Fungsi untuk membaca tema yang disimpan di Hive
+  Future<String> loadTheme() async {
+    var box = await Hive.openBox('settings');
+    return box.get('theme', defaultValue: 'Light'); // Jika tidak ada, gunakan default 'Light'
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,9 +49,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: _selectedTheme,
                 onChanged: (String? newValue) async {
                   if (newValue != null) {
-                    SharedPreferences prefs =
-                    await SharedPreferences.getInstance();
-                    await prefs.setString('theme', newValue);
+                    // Simpan tema baru menggunakan Hive
+                    await saveTheme(newValue);
+
                     setState(() {
                       _selectedTheme = newValue;
                     });
