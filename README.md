@@ -23,7 +23,7 @@ samples, guidance on mobile development, and a full API reference.
   path_provider: ^2.1.5`
 
 2. Inisialisasi Hive: Di dalam main.dart, kamu perlu menginisialisasi Hive terlebih dahulu agar bisa digunakan dalam aplikasi.
-   `import 'package:flutter/material.dart';
+   ` import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';  // Impor Hive
 import 'screens/main_screen.dart';
 
@@ -49,8 +49,7 @@ class MyApp extends StatelessWidget {
       home: MainScreen(),
     );
   }
-}
-`
+} `
 
 3. Membuat Box untuk Menyimpan Data: Selanjutnya, kamu perlu membuat box (semacam tabel) untuk menyimpan data Todo kamu menggunakan Hive. Setiap Todo akan disimpan dalam box.
    `import 'package:hive/hive.dart';
