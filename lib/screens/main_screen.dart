@@ -6,10 +6,13 @@ import '../services/quote_service.dart';
 import '../widgets/add_todo_dialog.dart';
 import '../widgets/gif_widget.dart';
 import 'settings_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/storage.dart';
-
 class MainScreen extends StatefulWidget {
+  final String theme;
+
+  // Required parameter 'theme'
+  MainScreen({required this.theme});
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -17,29 +20,21 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final List<Todo> _todos = [];
   late QuoteService _quoteService;
-  late String _theme = 'Light';
+  late String _theme;
   bool _showQuoteAndGif = true;
 
   @override
   void initState() {
     super.initState();
     _quoteService = QuoteService();
-    _loadTheme();
+    _theme = widget.theme; // Use the passed theme
     _loadTodos();
-  }
-
-  void _loadTheme() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _theme = prefs.getString('theme') ?? 'Light';
-    });
   }
 
   void _loadTodos() async {
     List<Todo> todos = await Storage.loadTodos();
     setState(() {
       _todos.addAll(todos);
-      // Check if there are any todos, if yes, hide the quote and GIF
       _showQuoteAndGif = _todos.isEmpty;
     });
   }
@@ -47,26 +42,24 @@ class _MainScreenState extends State<MainScreen> {
   void _addTodo(String todoTitle) {
     setState(() {
       _todos.add(Todo(title: todoTitle));
-      // Check if there are any todos, if yes, hide the quote and GIF
       _showQuoteAndGif = _todos.isEmpty;
     });
-    Storage.saveTodos(_todos); // Save todos to storage
+    Storage.saveTodos(_todos);
   }
 
   void _deleteTodo(Todo todo) {
     setState(() {
       _todos.remove(todo);
-      // Check if there are any todos, if not, show the quote and GIF
       _showQuoteAndGif = _todos.isEmpty;
     });
-    Storage.saveTodos(_todos); // Save todos to storage
+    Storage.saveTodos(_todos);
   }
 
   void _editTodoTitle(Todo todo, String newTitle) {
     setState(() {
       todo.title = newTitle;
     });
-    Storage.saveTodos(_todos); // Save todos to storage
+    Storage.saveTodos(_todos);
   }
 
   void _onChangeTheme(String newTheme) {
@@ -114,7 +107,6 @@ class _MainScreenState extends State<MainScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(height: 20),
-                // Only show quote and GIF if _showQuoteAndGif is true
                 if (_showQuoteAndGif)
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -124,14 +116,11 @@ class _MainScreenState extends State<MainScreen> {
                       GifWidget(),
                     ],
                   ),
-                // Show the todo list if there are todos
                 if (_todos.isNotEmpty)
                   TodoList(
                     todos: _todos,
                     onDelete: _deleteTodo,
-                    onSelect: (selected) {
-                      // Implement selecting logic here
-                    },
+                    onSelect: (selected) {},
                     onEditTitle: _editTodoTitle,
                   ),
               ],
