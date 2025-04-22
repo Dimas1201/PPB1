@@ -1,144 +1,117 @@
 import 'package:flutter/material.dart';
-import '../models/todo.dart';
-import '../widgets/todo_list.dart';
-import '../widgets/quote_widget.dart';
-import '../services/quote_service.dart';
-import '../widgets/add_todo_dialog.dart';
-import '../widgets/gif_widget.dart';
-import 'settings_screen.dart';
+import '../models/book.dart';
 import '../utils/storage.dart';
+
 class MainScreen extends StatefulWidget {
   final String theme;
-
-  // Required parameter 'theme'
-  MainScreen({required this.theme});
+  const MainScreen({Key? key, required this.theme}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  final List<Todo> _todos = [];
-  late QuoteService _quoteService;
-  late String _theme;
-  bool _showQuoteAndGif = true;
+  List<Book> books = [];
+
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _imageUrlController = TextEditingController();  // Controller untuk URL gambar
 
   @override
   void initState() {
     super.initState();
-    _quoteService = QuoteService();
-    _theme = widget.theme; // Use the passed theme
-    _loadTodos();
+    _loadBooks();
   }
 
-  void _loadTodos() async {
-    List<Todo> todos = await Storage.loadTodos();
+  void _loadBooks() async {
+    final data = await Storage.loadBooks();
     setState(() {
-      _todos.addAll(todos);
-      _showQuoteAndGif = _todos.isEmpty;
+      books = data;
     });
   }
 
-  void _addTodo(String todoTitle) {
-    setState(() {
-      _todos.add(Todo(title: todoTitle));
-      _showQuoteAndGif = _todos.isEmpty;
-    });
-    Storage.saveTodos(_todos);
+  void _addBook() async {
+    if (_titleController.text.isNotEmpty &&
+        _descriptionController.text.isNotEmpty &&
+        _imageUrlController.text.isNotEmpty) {
+      final book = Book(
+        storytitle: _titleController.text,
+        description: _descriptionController.text,
+        imageUrl: _imageUrlController.text,  // Ambil URL gambar
+      );
+      setState(() {
+        books.add(book);
+      });
+      await Storage.saveBooks(books);
+      _titleController.clear();
+      _descriptionController.clear();
+      _imageUrlController.clear();  // Kosongkan field URL gambar
+    }
   }
 
-  void _deleteTodo(Todo todo) {
-    setState(() {
-      _todos.remove(todo);
-      _showQuoteAndGif = _todos.isEmpty;
-    });
-    Storage.saveTodos(_todos);
-  }
 
-  void _editTodoTitle(Todo todo, String newTitle) {
+  void _deleteBook(int index) async {
     setState(() {
-      todo.title = newTitle;
+      books.removeAt(index);
     });
-    Storage.saveTodos(_todos);
-  }
-
-  void _onChangeTheme(String newTheme) {
-    setState(() {
-      _theme = newTheme;
-    });
+    await Storage.saveBooks(books);
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: _theme == 'Light'
-          ? ThemeData.light()
-          : ThemeData.dark().copyWith(
-        primaryColor: Colors.black,
-        scaffoldBackgroundColor: Colors.grey[900],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Story Base'),
+        backgroundColor: Colors.yellow,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('To Do List'),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.settings),
-              onPressed: () async {
-                final newTheme = await Navigator.push<String>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SettingsScreen(
-                      theme: _theme,
-                      onChangeTheme: _onChangeTheme,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(labelText: 'Title'),
+            ),
+            TextField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(labelText: 'description'),
+            ),
+            TextField(
+              controller: _imageUrlController,  // Input URL gambar
+              decoration: const InputDecoration(labelText: 'Image URL'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _addBook,
+              child: const Text('Add Book'),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: books.length,
+                itemBuilder: (context, index) {
+                  final book = books[index];
+                  return Card(
+                    child: ListTile(
+                      leading: book.imageUrl.isNotEmpty
+                          ? Image.network(book.imageUrl, width: 50, height: 75, fit: BoxFit.cover)
+                          : const Icon(Icons.book, size: 50),
+                      title: Text(book.storytitle),
+                      subtitle: Text('description: ${book.description}\n'),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+
+                        onPressed: () => _deleteBook(index),
+                      ),
                     ),
-                  ),
-                );
-                if (newTheme != null) {
-                  _onChangeTheme(newTheme);
-                }
-              },
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: 20),
-                if (_showQuoteAndGif)
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      QuoteWidget(quoteService: _quoteService),
-                      SizedBox(height: 90),
-                      GifWidget(),
-                    ],
-                  ),
-                if (_todos.isNotEmpty)
-                  TodoList(
-                    todos: _todos,
-                    onDelete: _deleteTodo,
-                    onSelect: (selected) {},
-                    onEditTitle: _editTodoTitle,
-                  ),
-              ],
-            ),
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => AddTodoDialog(
-                onAdd: _addTodo,
+                  );
+                },
               ),
-            );
-          },
-          child: Icon(Icons.add),
+            )
+          ],
         ),
       ),
     );
   }
 }
+
