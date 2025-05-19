@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="gcm_defaultSenderId" translatable="false">144899915965</string>
+    <string name="google_api_key" translatable="false">AIzaSyCrunnhsjwiHb-JrJAkg0zodhHSiPN_uoI</string>
+    <string name="google_app_id" translatable="false">1:144899915965:android:dc3d4a42dd91eee06877d4</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyCrunnhsjwiHb-JrJAkg0zodhHSiPN_uoI</string>
+    <string name="google_storage_bucket" translatable="false">fir-auth-c1946.firebasestorage.app</string>
+    <string name="project_id" translatable="false">fir-auth-c1946</string>
     <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
         
         <item name="android:windowBackground">@drawable/launch_background</item>

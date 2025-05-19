@@ -36,6 +36,12 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.1.2
+  cloud_firestore: ^4.17.5
+  firebase_core: ^2.32.0
+  firebase_auth: ^4.17.5
+  awesome_notifications: ^0.10.1
+
+
 
 
 
